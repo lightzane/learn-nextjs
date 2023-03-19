@@ -1,34 +1,188 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Learning Nextjs
 
-## Getting Started
+# Contents
 
-First, run the development server:
+1. [File-based routing](#file-based-routing)
+2. [Link Navigation](#link-navigation)
+3. [Navigating Programatically](#navigating-programatically)
+4. [Custom 404 Page]
 
-```bash
-npm run dev
-# or
-yarn dev
+## File-based routing
+
+Here are examples below.
+
+The first line will be the file-structure that contains foldernames and filenames.
+
+And below it is a `->` on how we can access it in the browser where `{app}` is equal to `http://localhost:3000` for example.
+
+### Static route
+
+Without parameters or queries.
+
+```
+pages/index.js
+-> {app}/
+
+pages/about.js
+-> {app}/about
+
+pages/subfolder/index.js
+-> {app}/subfolder
+
+pages/subfolder/another.js
+-> {app}/subfolder/another
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Dynamic route
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+With parameters and queries
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+```
+pages/portfolio/[portfolioId].js
+-> {app}/portfolio/[portfolioId]
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+pages/clients/[id]/index.js
+-> {app}/clients/[id]
 
-## Learn More
+pages/clients/[id]/[selected].js
+-> {app}/clients/[id]/[selected]
+```
 
-To learn more about Next.js, take a look at the following resources:
+### Access Route Query
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Example route: `http://localhost:3000/portfolio/myid`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+Filepath: `pages/portfolio/[portfolioId].js`
 
-## Deploy on Vercel
+```tsx
+import { useRouter } from 'next/router';
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+export default function PortfolioId() {
+  const router = useRouter();
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+  const query = router.query;
+
+  console.log(router.pathname); // -> /portfolio/[portfolioId]
+  console.log(query); // {portfolioId: 'myid'}
+
+  return (
+    <div>
+      <h1>PortfolioId</h1>
+      <p>You are looking for: {query.portfolioId}</p>
+    </div>
+  );
+}
+```
+
+### Catch-All Routes
+
+This is useful if you have multiple route segments but still want to use only one file for it. In this case, we will include a spread operator in the filename. `[...slug].js`
+
+```
+pages/blog/[...slug].js
+-> {app}/blog/2023/03/13
+```
+
+```ts
+console.log(router.query); // -> { slug: ['2023', '03', '13'] }
+
+// more example:
+// http://localhost:3000/blog/whatever/you/want
+console.log(router.query); // -> { slug: ['whatever', 'you', 'want'] }
+```
+
+## Link Navigation
+
+### Without Query or parameters
+
+```tsx
+import Link from 'next/link';
+
+export default function Home() {
+  return (
+    <div>
+      <h1>The Home Page</h1>
+      <ul>
+        <li>
+          <Link href="portfolio">Portfolio</Link>
+        </li>
+        <li>
+          <Link href="about">About</Link>
+        </li>
+        <li>
+          <Link href="clients">Clients</Link>
+        </li>
+      </ul>
+    </div>
+  );
+}
+```
+
+### With Query or parameters
+
+```tsx
+import Link from "next/link";
+
+export default function ClientProject() {
+
+    const clients = [
+        { id: 'sun', name: 'Our Sun' },
+        { id: 'moon', name: 'Our Moon' }
+    ]
+
+    return (
+        <div>
+            <h1>Client Page</h1>
+            <ul>
+                { clients.map((client)=>(
+                    <li key={client.id}>
+                        <Link href={{
+                            pathname: '/clients/[id]',
+                            query: { id: client.id }
+                        }}>{client.name}</Link>
+                    </li>
+                )) }
+            </ul>
+        </div>
+    )
+}
+```
+
+## Navigating Programatically
+
+```tsx
+import { useRouter } from "next/router";
+
+export default function ClientProject() {
+
+    const router = useRouter()
+
+    const query = router.query
+
+    function loadProjectHandler() {
+        // load data...
+        router.push(`/clients/${query.id}/project-a`) // -> user can use back button to go to previous page
+        // router.replace(`/clients/${query.id}/project-a`) // -> does not record history and cannot go back after navigation
+    }
+
+    return (
+        <div>
+            <h1>The Projects of a Given Client</h1>
+            <button onClick={loadProjectHandler}>Load {query.id.toUpperCase()} Project A</button>
+        </div>
+    )
+}
+```
+
+## Custom 404 Page
+
+Just add exact file name at the exact path `pages/404.js`
+
+```tsx
+// pages/404.js
+export default function NotFoundPage() {
+    return <div>
+        <h1>PAGE NOT FOUND</h1>
+    </div>
+}
+```
