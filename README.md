@@ -1,3 +1,28 @@
+# Learn NextJS
+
+Up to **NextJS 13**, you needed to add a nested `<a>` element in your `<Link>`s if you wanted to add custom attributes (e.g., `className`) to the anchor element.
+
+For example, the following code would be wrong (with **NextJS < v13**):
+
+```tsx
+<Link href="/" className="some-class">
+  Click me
+</Link>
+```
+
+Instead, you'd have to write this code:
+
+```tsx
+<Link href="/">
+  <a className="some-class">Click me</a>
+</Link>
+```
+
+## References
+
+- https://unsplash.com
+- https://heroicons.com
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
