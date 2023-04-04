@@ -1,11 +1,11 @@
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import useSWR from 'swr';
 import ErrorAlert from '../../components/error-alert/error-alert';
 import EventList from '../../components/events/event-list';
 import ResultsTitle from '../../components/results-title/results-title';
 import Button from '../../components/ui/button';
-import { getFilteredEvents } from '../../helpers/api-util';
-import useSWR from 'swr';
-import { useEffect, useState } from 'react';
+import Head from 'next/head';
 
 export default function FilteredEventsPage(props) {
   const [loadedEvents, setLoadedEvents] = useState();
@@ -23,14 +23,36 @@ export default function FilteredEventsPage(props) {
     }
   }, [data]);
 
+  let pageHeadData = (
+    <Head>
+      <title>Filtered Events</title>
+      <meta name="description" content={`All filtered events`}></meta>
+    </Head>
+  );
+
   if (!loadedEvents) {
-    return <p className="center">Loading...</p>;
+    return (
+      <>
+        {pageHeadData}
+        <p className="center">Loading...</p>
+      </>
+    );
   }
 
   const [strYear, strMonth] = slug;
 
   const year = +strYear;
   const month = +strMonth;
+
+  pageHeadData = (
+    <Head>
+      <title>Filtered Events</title>
+      <meta
+        name="description"
+        content={`All events for ${month}/${year}`}
+      ></meta>
+    </Head>
+  );
 
   const filteredEvents = loadedEvents.filter((event) => {
     const eventDate = new Date(event.date);
@@ -49,15 +71,19 @@ export default function FilteredEventsPage(props) {
     month > 12
   ) {
     return (
-      <ErrorAlert>
-        <p className="center">Invalid filter. Please adjust your values</p>
-      </ErrorAlert>
+      <>
+        {pageHeadData}
+        <ErrorAlert>
+          <p className="center">Invalid filter. Please adjust your values</p>
+        </ErrorAlert>
+      </>
     );
   }
 
   if (!filteredEvents || filteredEvents.length === 0) {
     return (
       <>
+        {pageHeadData}
         <div className="center">
           <ErrorAlert>
             <p className="center">No events found</p>
@@ -71,10 +97,11 @@ export default function FilteredEventsPage(props) {
   const date = new Date(year, month - 1);
 
   return (
-    <div>
+    <>
+      {pageHeadData}
       <ResultsTitle date={date} />
       <EventList items={filteredEvents} />
-    </div>
+    </>
   );
 }
 
