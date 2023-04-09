@@ -1,17 +1,23 @@
-import { useRef } from 'react';
+import { useContext, useRef } from 'react';
 import classes from './newsletter-registration.module.css';
+import NotificationContext from '../../store/notification.context';
 
 function NewsletterRegistration() {
   const emailInputRef = useRef();
+
+  const notificationCtx = useContext(NotificationContext);
 
   function registrationHandler(event) {
     event.preventDefault();
 
     const email = emailInputRef.current.value;
 
-    // fetch user input (state or refs)
-    // optional: validate input
-    // send valid data to API
+    notificationCtx.showNotification({
+      title: 'Signing up...',
+      message: 'Registering for newsletter',
+      status: 'pending',
+    });
+
     fetch('/api/newsletter', {
       method: 'POST',
       body: JSON.stringify({ email }),
@@ -19,8 +25,35 @@ function NewsletterRegistration() {
         'Content-Type': 'application/json',
       },
     })
-      .then((response) => response.json())
-      .then(console.log);
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+
+        response.json().then((data) => {
+          // TODO: Research on why not handle correctly and React interpreted it us unhandled error throwing during @eval
+          // To reproduce, go to /api/newsletter and write a res.status(500).json({ message:'error' })
+          throw new Error(data.message || 'Something went wrong');
+        });
+      })
+      .then((data) => {
+        if (data) {
+          notificationCtx.showNotification({
+            title: 'Success!',
+            message: 'Successfully registered for newsletter',
+            status: 'success',
+          });
+        }
+      })
+      .catch((err) => {
+        if (err) {
+          notificationCtx.showNotification({
+            title: 'Error!',
+            message: err.message || 'Something went wrong',
+            status: 'error',
+          });
+        }
+      });
   }
 
   return (
