@@ -1,56 +1,10 @@
-# Unique Topic
-
-Here you will learn about **React Portals**
-
-For example you have a `Notification` component somewhere nested down the element tree. Which is semantically incorrect. So we will implement **React Portals** and put it on the `_document.tsx`
-
-**notification.tsx**
-
-```tsx
-// components/ui/notification.tsx
-import React from 'react';
-...
-import ReactDOM from 'react-dom';
-
-export const Notification: React.FC<INotificationData> = (props) => {
-
-  ...
-
-  return ReactDOM.createPortal(
-    <div className={cssClasses}>
-      <h2>{title}</h2>
-      <p>{message}</p>
-    </div>,
-    document.getElementById('notifications') as HTMLDivElement // * see pages/_document.tsx
-  );
-};
-```
-
-Since that is a **React Portal**,
-
-The `<Notification>` component will be attached to the `#notifications` container even though it is being used in the **components/contact/contact-form.tsx**
-
-**\_document.tsx**
-
-```tsx
-// _document.tsx
-import { Html, Head, Main, NextScript } from 'next/document';
-
-export default function Document() {
-  return (
-    <Html lang="en">
-      <Head />
-      <body>
-        <Main />
-        <NextScript />
-        <div id="notifications"></div>
-      </body>
-    </Html>
-  );
-}
-```
-
-## Getting Started
+---
+title: Getting Started with Next.js
+excerpt: Next.JS is a React framework for Production - it makes building fullstack React apps and sites a breeze and ships with built-in SSR
+date: '2023-04-09'
+image: next.svg
+isFeatured: true
+---
 
 Created using `npx create-next-app learn-nextjs`
 
@@ -85,6 +39,8 @@ npm i react-markdown gray-matter react-syntax-highlighter
 ```
 npm i @types/react-syntax-highlighter -D
 ```
+
+![Alt text for image](next.svg)
 
 # Next.js
 
