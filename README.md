@@ -1,34 +1,62 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Next Auth
 
-## Getting Started
+The version used for this is app is `next-auth@4`
 
-First, run the development server:
+Reference: https://next-auth.js.org/
 
-```bash
-npm run dev
-# or
-yarn dev
+- https://next-auth.js.org/getting-started/example
+
+```
+npm install next-auth@
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+For encrypting password
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+```
+npm install bcryptjs
+```
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+## Observe the following files
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+**Encrypting the password**
 
-## Learn More
+- pages/api/auth/`signup.js`
 
-To learn more about Next.js, take a look at the following resources:
+**Verify Password and `NextAuth` Setup**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- pages/api/auth/`[...nextauth].js`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+**Handle LOGIN and SIGNIN**
 
-## Deploy on Vercel
+- components/auth/`auth-form.js`
+- pages/`_app.js`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**Handle Logout**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- components/layout/`main-navigation.js`
+
+**Sample Client-side guard route if not logged-in**
+
+- components/profile/`user-profile.js`
+
+**Server-side guard route if not logged-in**
+
+- pages/`profile.js`
+
+**Change Password Logic**
+
+- components/profile/`profile-form.js`
+- components/profile/`user-profile.js`
+
+## Session
+
+1. The session is automatically populated in the browser when using the `signIn()` from **next-auth/react**.
+
+2. We must setup a `SessionProvider` in **\_app.js** so the session will be available throughout the application via `getSession()` and `getServerSession()`
+
+**References**:
+
+- https://next-auth.js.org/configuration/nextjs#in-getserversideprops
+- https://next-auth.js.org/configuration/nextjs#in-api-routes
+- https://next-auth.js.org/getting-started/client#usesession
+- https://next-auth.js.org/getting-started/client#sessionprovider
